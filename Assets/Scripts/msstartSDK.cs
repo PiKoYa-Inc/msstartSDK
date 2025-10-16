@@ -33,8 +33,6 @@ public class msstartSDK : MonoBehaviour
 
     private bool loadingInterstitial = false;
     private bool loadingRewarded = false;
-    private bool isLoadingAd = false; // Global flag to prevent concurrent ad loads
-
     private bool adQueued = false;
     #endregion
 
