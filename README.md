@@ -345,57 +345,6 @@ public class RewardShop : MonoBehaviour
 7. User calls `ShowInterstitial()` → **JavaScript** shows ad
 8. Ad completes → **JavaScript** sends completion callback → **Unity** executes stored `Action`
 
----
-
-## 🔐 Best Practices
-
-### 1. Preload Ads Early
-```csharp
-// Load ads at game start or level load
-void Start()
-{
-    msstartSDK.Instance.LoadInterstitial();
-    msstartSDK.Instance.LoadRewarded();
-}
-```
-
-### 2. Check Ad Readiness
-```csharp
-// Always check before showing
-if (msstartSDK.Instance.RewardedReady)
-{
-    msstartSDK.Instance.ShowRewarded(callback);
-}
-```
-
-### 3. Reload After Showing
-```csharp
-// Ads are single-use, reload for next time
-msstartSDK.Instance.ShowRewarded(new Action(() =>
-{
-    GiveReward();
-    msstartSDK.Instance.LoadRewarded(); // Preload next ad
-}));
-```
-
-### 4. Handle Timeouts
-```csharp
-// SDK has built-in 5-second timeout
-// Provide user feedback if ad fails to load
-if (!msstartSDK.Instance.RewardedReady)
-{
-    ShowMessage("No ads available, try again later");
-}
-```
-
-### 5. Test in Editor First
-```csharp
-// Use mock system to verify game logic
-// Then test in WebGL build with real SDK
-#if UNITY_EDITOR
-    Debug.Log("Using mock ads in Editor");
-#endif
-
 ```
 
 ## 🆘 Support
