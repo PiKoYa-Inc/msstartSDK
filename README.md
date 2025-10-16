@@ -473,15 +473,8 @@ if (!msstartSDK.Instance.RewardedReady)
 #if UNITY_EDITOR
     Debug.Log("Using mock ads in Editor");
 #endif
+
 ```
-
----
-
-## 📄 License
-
-This SDK is provided as-is for integration with Microsoft Start Ads. Ensure compliance with Microsoft Start's terms of service.
-
----
 
 ## 🆘 Support
 
@@ -489,7 +482,7 @@ For issues or questions:
 1. Check the **Troubleshooting** section
 2. Review browser console logs in WebGL builds
 3. Verify Microsoft Start SDK is properly initialized
-4. Test with mock ads in Unity Editor first
+4. Refer to the [MSSTART SDK DOCUMENTATION](https://msstart-games-sdk-doc.azurewebsites.net/docs/sdk-apis/#rewarded-ad)
 
 ---
 
