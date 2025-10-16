@@ -26,7 +26,7 @@ public class TestBtn : MonoBehaviour
     }
 
 
-    public void OnClick()
+    public void RequestReward()
     {
         msstartSDK.Instance.ShowRewarded(new Action(() =>
         {
