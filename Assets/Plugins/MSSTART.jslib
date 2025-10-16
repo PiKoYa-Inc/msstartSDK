@@ -5,16 +5,12 @@
     var isMSStartAvailable = typeof window.$msstart !== 'undefined' && window.$msstart !== null;
     
     if (isMSStartAvailable) {
-      console.log(`[MIG] Loading ${isRewarded ? 'rewarded' : 'interstitial'} ad from real SDK...`);
-      
       return window.$msstart.loadAdsAsync(isRewarded)
         .then(adInstance => {
           const gameObjectName = "msstartSDK";
           const methodName = isRewarded ? "OnRewardedLoaded" : "OnInterstitialLoaded";
           
           if (adInstance && adInstance.instanceId) {
-            console.log(`[MIG] ${isRewarded ? 'Rewarded' : 'Interstitial'} loaded: ${adInstance.instanceId}`);
-            
             // Call Unity callback
             if (typeof unityInstance !== 'undefined') {
               unityInstance.SendMessage(gameObjectName, methodName, adInstance.instanceId);
@@ -49,7 +45,6 @@
       
       // Mock implementation
       return new Promise((resolve) => {
-        console.log(`[MIG Mock] loadAdsAsync called with isRewarded = ${isRewarded}`);
         setTimeout(() => {
           var mockInstanceId = isRewarded ? "rewarded_mock_" + Math.floor(Math.random() * 1000) : "interstitial_mock_" + Math.floor(Math.random() * 1000);
           var adInstance = {
@@ -80,15 +75,11 @@
     var isMSStartAvailable = typeof window.$msstart !== 'undefined' && window.$msstart !== null;
     
     if (isMSStartAvailable) {
-      console.log(`[MIG] Showing ad with instanceID = ${instanceId}`);
-      
       return window.$msstart.showAdsAsync(instanceId)
         .then(adInstance => {
           if (adInstance && adInstance.showAdsCompletedAsync) {
             adInstance.showAdsCompletedAsync
               .then(() => {
-                console.log("[MIG] Ad completed");
-                
                 const gameObjectName = "msstartSDK";
                 const isRewarded = instanceId.includes("rewarded");
                 const methodName = isRewarded ? "OnRewardedCompleted" : "OnInterstitialCompleted";
@@ -109,8 +100,6 @@
                 }
               })
               .catch(ex => {
-                console.log("[MIG] Ad skipped/error:", ex);
-                
                 const gameObjectName = "msstartSDK";
                 const isRewarded = instanceId.includes("rewarded");
                 
@@ -154,8 +143,6 @@
       console.warn("[MIG] Real SDK not available, using mock");
       
       // Mock implementation
-      console.log(`[MIG Mock] showAdsAsync called with instanceID = ${instanceId}`);
-      
       return new Promise((resolve) => {
         setTimeout(() => {
           const adWasCompleted = Math.random() < 0.8; // 80% completion rate
@@ -163,10 +150,7 @@
 
           if (adWasCompleted) {
             adInstance.showAdsCompletedAsync = new Promise((resolve) => {
-              console.log("[MIG Mock] Simulating ad completed");
               setTimeout(() => {
-                console.log("[MIG Mock] Ad completed");
-                
                 const gameObjectName = "msstartSDK";
                 const isRewarded = instanceId.includes("rewarded");
                 const methodName = isRewarded ? "OnRewardedCompleted" : "OnInterstitialCompleted";
@@ -190,10 +174,7 @@
             });
           } else {
             adInstance.showAdsCompletedAsync = new Promise((_, reject) => {
-              console.log("[MIG Mock] Simulating ad skipped");
               setTimeout(() => {
-                console.log("[MIG Mock] Ad skipped");
-                
                 const gameObjectName = "msstartSDK";
                 const isRewarded = instanceId.includes("rewarded");
                 
