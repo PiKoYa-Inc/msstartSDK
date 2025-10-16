@@ -484,17 +484,5 @@ For issues or questions:
 3. Verify Microsoft Start SDK is properly initialized
 4. Refer to the [MSSTART SDK DOCUMENTATION](https://msstart-games-sdk-doc.azurewebsites.net/docs/sdk-apis/#rewarded-ad)
 
----
-
-## 🎉 Quick Start Checklist
-
-- [ ] Copy `msstartSDK.cs`, `MSSTART.jslib`, and `WebGLTemplates/MSSTART/` folder to your project
-- [ ] Set WebGL Template to `MSSTART` in Player Settings
-- [ ] Add `msstartSDK` GameObject to your scene (or let singleton create it)
-- [ ] Call `LoadInterstitial()` and `LoadRewarded()` at game start
-- [ ] Implement reward logic with callbacks or events
-- [ ] Test in Unity Editor with mock ads
-- [ ] Build for WebGL and test with real Microsoft Start SDK
-- [ ] Deploy to your web server
 
 **You're ready to monetize your Unity WebGL game! 🚀**
