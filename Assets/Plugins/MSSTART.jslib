@@ -1,12 +1,13 @@
 ﻿mergeInto(LibraryManager.library, {
-  // Main API - automatically uses real SDK if available, otherwise uses mock
+  // Main API - automatically uses SDK if available, otherwise uses mock
   loadAdsAsync: function (isRewarded) {
+    isRewarded = isRewarded === 1;
     // Check if real Microsoft Start SDK is available
     var isMSStartAvailable = typeof window.$msstart !== 'undefined' && window.$msstart !== null;
     
     if (isMSStartAvailable) {
-      console.log(`[MIG] Loading ${isRewarded ? 'rewarded' : 'interstitial'} ad from real SDK...`);
-      
+      console.log(`[MIG] Loading ${isRewarded ? 'rewarded' : 'interstitial'} ad from SDK...`);
+  
       return window.$msstart.loadAdsAsync(isRewarded)
         .then(adInstance => {
           const gameObjectName = "msstartSDK";
@@ -47,7 +48,7 @@
           throw error;
         });
     } else {
-      console.warn("[MIG] Real SDK not available, using mock");
+      console.warn("[MIG] SDK not available, using mock");
       
       // Mock implementation
       return new Promise((resolve) => {
@@ -117,9 +118,9 @@
                 } else {
                   // Interstitial error
                   if (typeof unityInstance !== 'undefined') {
-                    unityInstance.SendMessage(gameObjectName, "OnAdError", "Ad skipped or failed");
+                    unityInstance.SendMessage(gameObjectName, "OnAdError", "Ad skipped or failed", isRewarded);
                   } else if (typeof gameInstance !== 'undefined') {
-                    gameInstance.SendMessage(gameObjectName, "OnAdError", "Ad skipped or failed");
+                    gameInstance.SendMessage(gameObjectName, "OnAdError", "Ad skipped or failed", isRewarded);
                   }
                 }
               });

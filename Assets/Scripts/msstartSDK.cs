@@ -8,10 +8,10 @@ public class msstartSDK : MonoBehaviour
     #region WebGL External Calls
     [DllImport("__Internal")]
     private static extern void pingAsync();
-    
+
     [DllImport("__Internal")]
     private static extern void loadAdsAsync(bool isRewarded);
-    
+
     [DllImport("__Internal")]
     private static extern void showAdsAsync(string instanceId, bool isRewarded);
     #endregion
@@ -19,7 +19,7 @@ public class msstartSDK : MonoBehaviour
     #region Constants
     private const float AD_LOAD_TIMEOUT = 5.0f;
     private const string LOG_PREFIX = "[MIG]";
-    
+
     // Editor mock settings
     private const float MOCK_AD_LOAD_TIME = 1.0f;
     private const float MOCK_INTERSTITIAL_DURATION = 2.0f;
@@ -30,10 +30,11 @@ public class msstartSDK : MonoBehaviour
     #region Ad State Variables
     private string interstitialInstance = "";
     private string rewardedInstance = "";
-    
+
     private bool loadingInterstitial = false;
     private bool loadingRewarded = false;
-    
+    private bool isLoadingAd = false; // Global flag to prevent concurrent ad loads
+
     private bool adQueued = false;
     #endregion
 
@@ -45,7 +46,7 @@ public class msstartSDK : MonoBehaviour
 
     #region Public Properties
     public bool IsAdsAllowed { get; set; } = true;
-    
+
     public bool InterstitialReady => !string.IsNullOrEmpty(interstitialInstance);
     public bool RewardedReady => !string.IsNullOrEmpty(rewardedInstance);
     public bool RvReady => RewardedReady;
@@ -64,7 +65,7 @@ public class msstartSDK : MonoBehaviour
     {
         // Set the GameObject name so JavaScript can find it in case the name is different
         gameObject.name = "msstartSDK";
-        
+
         if (Instance == null)
         {
             Instance = this;
@@ -93,7 +94,7 @@ public class msstartSDK : MonoBehaviour
         {
             LoadRewarded();
         }
-        
+
         if (!InterstitialReady)
         {
             LoadInterstitial();
@@ -142,13 +143,13 @@ public class msstartSDK : MonoBehaviour
             Debug.LogError($"{LOG_PREFIX} Ad already queued.");
             return false;
         }
-        
+
         if (!IsAdsAllowed)
         {
             Debug.LogError($"{LOG_PREFIX} Ads aren't allowed.");
             return false;
         }
-        
+
         if (string.IsNullOrEmpty(instanceId))
         {
             Debug.LogError($"{LOG_PREFIX} No {adType} instance available.");
@@ -166,7 +167,7 @@ public class msstartSDK : MonoBehaviour
         {
             return;
         }
-        
+
         loadingInterstitial = true;
         StartCoroutine(LoadAdCoroutine(false));
     }
@@ -177,7 +178,7 @@ public class msstartSDK : MonoBehaviour
         {
             return;
         }
-        
+
         loadingRewarded = true;
         StartCoroutine(LoadAdCoroutine(true));
     }
@@ -185,8 +186,8 @@ public class msstartSDK : MonoBehaviour
     private IEnumerator LoadAdCoroutine(bool isRewarded)
     {
         string adType = isRewarded ? "rewarded" : "interstitial";
-        
-        #if UNITY_WEBGL && !UNITY_EDITOR
+
+#if UNITY_WEBGL && !UNITY_EDITOR
         loadAdsAsync(isRewarded);
         
         float timer = 0f;
@@ -222,12 +223,12 @@ public class msstartSDK : MonoBehaviour
             interstitialInstance = "";
             loadingInterstitial = false;
         }
-        #else
+#else
         // Mock ad loading in Editor
         yield return new WaitForSecondsRealtime(MOCK_AD_LOAD_TIME);
-        
+
         string mockInstanceId = $"{adType}_{UnityEngine.Random.Range(100, 999)}";
-        
+
         if (isRewarded)
         {
             OnRewardedLoaded(mockInstanceId);
@@ -236,43 +237,43 @@ public class msstartSDK : MonoBehaviour
         {
             OnInterstitialLoaded(mockInstanceId);
         }
-        #endif
+#endif
     }
     #endregion
 
     #region Show Ad Coroutines
     private IEnumerator ShowInterstitialCoroutine()
     {
-        #if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR
         showAdsAsync(interstitialInstance, false);
         yield return null;
-        #else
+#else
         // Mock interstitial ad in Editor
         Debug.Log($"{LOG_PREFIX} [Editor Mock] Showing interstitial ad - Ad playing for {MOCK_INTERSTITIAL_DURATION}s");
-        
+
         yield return new WaitForSecondsRealtime(MOCK_INTERSTITIAL_DURATION);
-        
+
         OnInterstitialCompleted();
-        #endif
+#endif
     }
 
     private IEnumerator ShowRewardedCoroutine(object reward)
     {
         // Store the reward callback so it can be executed when the ad completes
         currentRewardCallback = reward;
-        
-        #if UNITY_WEBGL && !UNITY_EDITOR
+
+#if UNITY_WEBGL && !UNITY_EDITOR
         showAdsAsync(rewardedInstance, true);
         yield return null;
-        #else
+#else
         // Mock rewarded ad in Editor
         Debug.Log($"{LOG_PREFIX} [Editor Mock] Showing rewarded ad - Ad playing for {MOCK_REWARDED_DURATION}s");
-        
+
         yield return new WaitForSecondsRealtime(MOCK_REWARDED_DURATION);
-        
+
         // Simulate random completion or skip
         bool adCompleted = UnityEngine.Random.Range(0f, 1f) < MOCK_REWARDED_COMPLETION_RATE;
-        
+
         if (adCompleted)
         {
             OnRewardedCompleted(true, reward);
@@ -281,7 +282,7 @@ public class msstartSDK : MonoBehaviour
         {
             OnRewardedCompleted(false, reward);
         }
-        #endif
+#endif
     }
     #endregion
 
@@ -291,11 +292,11 @@ public class msstartSDK : MonoBehaviour
         // Backup current game state
         beforeAdVolume = AudioListener.volume;
         beforeAdTimeScale = Time.timeScale;
-        
+
         // Pause game during ad
         AudioListener.volume = 0f;
         Time.timeScale = 0f;
-        
+
         beforeAdCalled = true;
         OnAdStarted?.Invoke();
     }
@@ -303,7 +304,7 @@ public class msstartSDK : MonoBehaviour
     private void AdEnded()
     {
         adQueued = false;
-        
+
         if (beforeAdCalled)
         {
             // Restore game state
@@ -311,7 +312,7 @@ public class msstartSDK : MonoBehaviour
             Time.timeScale = beforeAdTimeScale;
             beforeAdCalled = false;
         }
-        
+
         OnAdEnded?.Invoke();
     }
     #endregion
@@ -342,7 +343,7 @@ public class msstartSDK : MonoBehaviour
         AdEnded();
         interstitialInstance = "";
     }
-    
+
     // Overload to handle string parameter from JavaScript (not used but needed for compatibility)
     public void OnInterstitialCompleted(string unused)
     {
@@ -355,13 +356,13 @@ public class msstartSDK : MonoBehaviour
     // Note: This is called from WebGL, so it doesn't have access to the reward callback
     // The reward callback needs to be stored when ShowRewarded is called
     private object currentRewardCallback = null;
-    
+
     public void OnRewardedCompleted(string shouldRewardStr)
     {
         bool shouldReward = shouldRewardStr == "true";
-        
+
         AdEnded();
-        
+
         if (shouldReward)
         {
             // Execute the stored reward callback if it's an Action
@@ -369,20 +370,20 @@ public class msstartSDK : MonoBehaviour
             {
                 rewardAction?.Invoke();
             }
-            
+
             // Also fire the event for other listeners
             OnRewardPlayer?.Invoke(currentRewardCallback);
         }
-        
+
         rewardedInstance = "";
         currentRewardCallback = null; // Clear the callback
     }
-    
+
     // Overload for direct bool calls (used by editor mock)
     public void OnRewardedCompleted(bool shouldReward, object reward = null)
     {
         AdEnded();
-        
+
         if (shouldReward)
         {
             // Execute the reward callback if it's an Action
@@ -390,24 +391,32 @@ public class msstartSDK : MonoBehaviour
             {
                 rewardAction?.Invoke();
             }
-            
+
             // Also fire the event for other listeners
             OnRewardPlayer?.Invoke(reward);
         }
-        
+
         rewardedInstance = "";
     }
 
     // Callback invoked from JavaScript when an ad fails to load or play
     // Do not call manually - this is invoked automatically by the WebGL bridge
-    public void OnAdError(string error)
+    public void OnAdError(string error, bool isRewarded)
     {
         AdEnded();
         Debug.LogError($"{LOG_PREFIX} Ad error: {error}");
-        interstitialInstance = "";
-        rewardedInstance = "";
-        loadingInterstitial = false;
-        loadingRewarded = false;
+
+
+        if (isRewarded)
+        {
+            rewardedInstance = "";
+            loadingRewarded = false;
+        }
+        else
+        {
+            interstitialInstance = "";
+            loadingInterstitial = false;
+        }
     }
     #endregion
 }
