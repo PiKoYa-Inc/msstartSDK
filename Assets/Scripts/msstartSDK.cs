@@ -244,7 +244,7 @@ public class msstartSDK : MonoBehaviour
     private IEnumerator ShowInterstitialCoroutine()
     {
         #if UNITY_WEBGL && !UNITY_EDITOR
-        showAdsAsync(interstitialInstance, false);
+        showAdsAsync(interstitialInstance);
         yield return null;
         #else
         // Mock interstitial ad in Editor
@@ -262,7 +262,7 @@ public class msstartSDK : MonoBehaviour
         currentRewardCallback = reward;
         
         #if UNITY_WEBGL && !UNITY_EDITOR
-        showAdsAsync(rewardedInstance, true);
+            (rewardedInstance, true);
         yield return null;
         #else
         // Mock rewarded ad in Editor
