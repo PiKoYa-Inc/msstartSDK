@@ -18,7 +18,11 @@ public class TestBtn : MonoBehaviour
         if (btnType == BtnTypes.Interstitial)
             button.interactable = msstartSDK.Instance.InterstitialReady;
         else if (btnType == BtnTypes.Rewarded)
+        {
             button.interactable = msstartSDK.Instance.RewardedReady;
+            Image img = gameObject.GetComponent<Image>();
+                img.color = Color.Lerp(img.color, Color.white, Time.deltaTime * 5f);
+        }
     }
 
 
