@@ -13,7 +13,7 @@ public class msstartSDK : MonoBehaviour
     private static extern void loadAdsAsync(bool isRewarded);
     
     [DllImport("__Internal")]
-    private static extern void showAdsAsync(string instanceId);
+    private static extern void showAdsAsync(string instanceId, bool isRewarded);
     #endregion
 
     #region Constants
@@ -244,7 +244,7 @@ public class msstartSDK : MonoBehaviour
     private IEnumerator ShowInterstitialCoroutine()
     {
         #if UNITY_WEBGL && !UNITY_EDITOR
-        showAdsAsync(interstitialInstance);
+        showAdsAsync(interstitialInstance, false);
         yield return null;
         #else
         // Mock interstitial ad in Editor
