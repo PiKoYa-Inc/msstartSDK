@@ -123,7 +123,6 @@ public class msstartSDK : MonoBehaviour
 
     public void ShowRewarded(object reward = null)
     {
-        Debug.Log($"{LOG_PREFIX} ShowRewarded called with reward: {reward}");
         if (!CanShowAd(rewardedInstance, "Rewarded"))
         {
             return;
@@ -138,7 +137,6 @@ public class msstartSDK : MonoBehaviour
     #region Ad Validation
     private bool CanShowAd(string instanceId, string adType)
     {
-        Debug.Log($"{LOG_PREFIX} Attempting to show {adType} ad with instanceId: {instanceId}");
         if (adQueued)
         {
             Debug.LogError($"{LOG_PREFIX} Ad already queued.");
@@ -187,7 +185,6 @@ public class msstartSDK : MonoBehaviour
     private IEnumerator LoadAdCoroutine(bool isRewarded)
     {
         string adType = isRewarded ? "rewarded" : "interstitial";
-        Debug.Log($"{LOG_PREFIX} Loading {adType} ad...");
         
         #if UNITY_WEBGL && !UNITY_EDITOR
         loadAdsAsync(isRewarded);
@@ -203,7 +200,6 @@ public class msstartSDK : MonoBehaviour
             string currentInstance = isRewarded ? rewardedInstance : interstitialInstance;
             if (!string.IsNullOrEmpty(currentInstance))
             {
-                Debug.Log($"{LOG_PREFIX} {adType} loaded successfully: {currentInstance}");
                 if (isRewarded)
                     loadingRewarded = false;
                 else
@@ -240,8 +236,6 @@ public class msstartSDK : MonoBehaviour
         {
             OnInterstitialLoaded(mockInstanceId);
         }
-        
-        Debug.Log($"{LOG_PREFIX} [Editor Mock] {adType} loaded successfully: {mockInstanceId}");
         #endif
     }
     #endregion
@@ -254,12 +248,10 @@ public class msstartSDK : MonoBehaviour
         yield return null;
         #else
         // Mock interstitial ad in Editor
-        Debug.Log($"{LOG_PREFIX} [Editor Mock] Showing interstitial ad...");
-        Debug.Log($"{LOG_PREFIX} [Editor Mock] Game paused - Ad playing for {MOCK_INTERSTITIAL_DURATION}s");
+        Debug.Log($"{LOG_PREFIX} [Editor Mock] Showing interstitial ad - Ad playing for {MOCK_INTERSTITIAL_DURATION}s");
         
         yield return new WaitForSecondsRealtime(MOCK_INTERSTITIAL_DURATION);
         
-        Debug.Log($"{LOG_PREFIX} [Editor Mock] Interstitial ad completed");
         OnInterstitialCompleted();
         #endif
     }
@@ -274,8 +266,7 @@ public class msstartSDK : MonoBehaviour
         yield return null;
         #else
         // Mock rewarded ad in Editor
-        Debug.Log($"{LOG_PREFIX} [Editor Mock] Showing rewarded ad...");
-        Debug.Log($"{LOG_PREFIX} [Editor Mock] Game paused - Ad playing for {MOCK_REWARDED_DURATION}s");
+        Debug.Log($"{LOG_PREFIX} [Editor Mock] Showing rewarded ad - Ad playing for {MOCK_REWARDED_DURATION}s");
         
         yield return new WaitForSecondsRealtime(MOCK_REWARDED_DURATION);
         
@@ -284,12 +275,10 @@ public class msstartSDK : MonoBehaviour
         
         if (adCompleted)
         {
-            Debug.Log($"{LOG_PREFIX} [Editor Mock] Rewarded ad completed - User watched full ad");
             OnRewardedCompleted(true, reward);
         }
         else
         {
-            Debug.Log($"{LOG_PREFIX} [Editor Mock] Rewarded ad skipped - User closed early");
             OnRewardedCompleted(false, reward);
         }
         #endif
@@ -309,8 +298,6 @@ public class msstartSDK : MonoBehaviour
         
         beforeAdCalled = true;
         OnAdStarted?.Invoke();
-        
-        Debug.Log($"{LOG_PREFIX} Ad started - Game paused");
     }
 
     private void AdEnded()
@@ -326,7 +313,6 @@ public class msstartSDK : MonoBehaviour
         }
         
         OnAdEnded?.Invoke();
-        Debug.Log($"{LOG_PREFIX} Ad ended - Game resumed");
     }
     #endregion
 
@@ -354,7 +340,6 @@ public class msstartSDK : MonoBehaviour
     public void OnInterstitialCompleted()
     {
         AdEnded();
-        Debug.Log($"{LOG_PREFIX} Interstitial completed");
         interstitialInstance = "";
     }
     
@@ -379,8 +364,6 @@ public class msstartSDK : MonoBehaviour
         
         if (shouldReward)
         {
-            Debug.Log($"{LOG_PREFIX} Rewarded completed - Player rewarded");
-            
             // Execute the stored reward callback if it's an Action
             if (currentRewardCallback is Action rewardAction)
             {
@@ -389,10 +372,6 @@ public class msstartSDK : MonoBehaviour
             
             // Also fire the event for other listeners
             OnRewardPlayer?.Invoke(currentRewardCallback);
-        }
-        else
-        {
-            Debug.Log($"{LOG_PREFIX} Rewarded skipped");
         }
         
         rewardedInstance = "";
@@ -406,8 +385,6 @@ public class msstartSDK : MonoBehaviour
         
         if (shouldReward)
         {
-            Debug.Log($"{LOG_PREFIX} Rewarded completed - Player rewarded");
-            
             // Execute the reward callback if it's an Action
             if (reward is Action rewardAction)
             {
@@ -416,10 +393,6 @@ public class msstartSDK : MonoBehaviour
             
             // Also fire the event for other listeners
             OnRewardPlayer?.Invoke(reward);
-        }
-        else
-        {
-            Debug.Log($"{LOG_PREFIX} Rewarded skipped");
         }
         
         rewardedInstance = "";
