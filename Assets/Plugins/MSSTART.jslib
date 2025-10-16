@@ -5,12 +5,16 @@
     var isMSStartAvailable = typeof window.$msstart !== 'undefined' && window.$msstart !== null;
     
     if (isMSStartAvailable) {
+      console.log(`[MIG] Loading ${isRewarded ? 'rewarded' : 'interstitial'} ad from real SDK...`);
+      
       return window.$msstart.loadAdsAsync(isRewarded)
         .then(adInstance => {
           const gameObjectName = "msstartSDK";
           const methodName = isRewarded ? "OnRewardedLoaded" : "OnInterstitialLoaded";
           
           if (adInstance && adInstance.instanceId) {
+            console.log(`[MIG] ${isRewarded ? 'Rewarded' : 'Interstitial'} loaded: ${adInstance.instanceId}`);
+            
             // Call Unity callback
             if (typeof unityInstance !== 'undefined') {
               unityInstance.SendMessage(gameObjectName, methodName, adInstance.instanceId);
@@ -19,6 +23,8 @@
             } else {
               console.warn("[MIG] Unity instance not found for callback");
             }
+          } else {
+            console.warn(`[MIG] ${isRewarded ? 'Rewarded' : 'Interstitial'} ad instance or instanceId is missing`);
           }
           
           return adInstance;
