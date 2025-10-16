@@ -345,7 +345,7 @@ public class RewardShop : MonoBehaviour
 7. User calls `ShowInterstitial()` → **JavaScript** shows ad
 8. Ad completes → **JavaScript** sends completion callback → **Unity** executes stored `Action`
 
-```
+---
 
 ## 🆘 Support
 
