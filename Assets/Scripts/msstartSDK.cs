@@ -123,6 +123,7 @@ public class msstartSDK : MonoBehaviour
 
     public void ShowRewarded(object reward = null)
     {
+        Debug.Log($"{LOG_PREFIX} ShowRewarded called with reward: {reward}");
         if (!CanShowAd(rewardedInstance, "Rewarded"))
         {
             return;
@@ -265,6 +266,9 @@ public class msstartSDK : MonoBehaviour
 
     private IEnumerator ShowRewardedCoroutine(object reward)
     {
+        // Store the reward callback so it can be executed when the ad completes
+        currentRewardCallback = reward;
+        
         #if UNITY_WEBGL && !UNITY_EDITOR
         showAdsAsync(rewardedInstance);
         yield return null;
@@ -363,6 +367,10 @@ public class msstartSDK : MonoBehaviour
     // Callback invoked from JavaScript when a rewarded ad finishes or is skipped
     // Do not call manually - this is invoked automatically by the WebGL bridge
     // JavaScript sends "true" or "false" as string
+    // Note: This is called from WebGL, so it doesn't have access to the reward callback
+    // The reward callback needs to be stored when ShowRewarded is called
+    private object currentRewardCallback = null;
+    
     public void OnRewardedCompleted(string shouldRewardStr)
     {
         bool shouldReward = shouldRewardStr == "true";
@@ -372,7 +380,15 @@ public class msstartSDK : MonoBehaviour
         if (shouldReward)
         {
             Debug.Log($"{LOG_PREFIX} Rewarded completed - Player rewarded");
-            OnRewardPlayer?.Invoke(null);
+            
+            // Execute the stored reward callback if it's an Action
+            if (currentRewardCallback is Action rewardAction)
+            {
+                rewardAction?.Invoke();
+            }
+            
+            // Also fire the event for other listeners
+            OnRewardPlayer?.Invoke(currentRewardCallback);
         }
         else
         {
@@ -380,6 +396,7 @@ public class msstartSDK : MonoBehaviour
         }
         
         rewardedInstance = "";
+        currentRewardCallback = null; // Clear the callback
     }
     
     // Overload for direct bool calls (used by editor mock)
@@ -390,6 +407,14 @@ public class msstartSDK : MonoBehaviour
         if (shouldReward)
         {
             Debug.Log($"{LOG_PREFIX} Rewarded completed - Player rewarded");
+            
+            // Execute the reward callback if it's an Action
+            if (reward is Action rewardAction)
+            {
+                rewardAction?.Invoke();
+            }
+            
+            // Also fire the event for other listeners
             OnRewardPlayer?.Invoke(reward);
         }
         else

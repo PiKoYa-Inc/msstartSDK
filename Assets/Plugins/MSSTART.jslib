@@ -20,6 +20,8 @@
               unityInstance.SendMessage(gameObjectName, methodName, adInstance.instanceId);
             } else if (typeof gameInstance !== 'undefined') {
               gameInstance.SendMessage(gameObjectName, methodName, adInstance.instanceId);
+            } else {
+              console.warn("[MIG] Unity instance not found for callback");
             }
           }
           
@@ -36,8 +38,10 @@
             unityInstance.SendMessage(gameObjectName, "OnAdError", errorMessage);
           } else if (typeof gameInstance !== 'undefined') {
             gameInstance.SendMessage(gameObjectName, "OnAdError", errorMessage);
+          } else {
+            console.warn("[MIG] Unity instance not found for callback");
           }
-          
+
           throw error;
         });
     } else {
