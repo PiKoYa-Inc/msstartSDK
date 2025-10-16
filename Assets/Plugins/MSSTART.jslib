@@ -74,7 +74,7 @@
     }
   },
 
-  showAdsAsync: function (instanceID_string) {
+  showAdsAsync: function (instanceID_string, isRewarded = false) {
     const instanceId = UTF8ToString(instanceID_string);
     
     // Check if real Microsoft Start SDK is available
@@ -87,7 +87,6 @@
             adInstance.showAdsCompletedAsync
               .then(() => {
                 const gameObjectName = "msstartSDK";
-                const isRewarded = instanceId.includes("rewarded");
                 const methodName = isRewarded ? "OnRewardedCompleted" : "OnInterstitialCompleted";
                 
                 // Call Unity callback
@@ -107,7 +106,6 @@
               })
               .catch(ex => {
                 const gameObjectName = "msstartSDK";
-                const isRewarded = instanceId.includes("rewarded");
                 
                 if (isRewarded) {
                   // Rewarded ad was skipped

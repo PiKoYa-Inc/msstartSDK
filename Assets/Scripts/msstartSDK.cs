@@ -262,7 +262,7 @@ public class msstartSDK : MonoBehaviour
         currentRewardCallback = reward;
         
         #if UNITY_WEBGL && !UNITY_EDITOR
-        showAdsAsync(rewardedInstance);
+        showAdsAsync(rewardedInstance, true);
         yield return null;
         #else
         // Mock rewarded ad in Editor
@@ -323,7 +323,7 @@ public class msstartSDK : MonoBehaviour
     {
         interstitialInstance = instanceId;
         loadingInterstitial = false;
-        Debug.Log($"{LOG_PREFIX} Interstitial loaded: {instanceId}");
+        Debug.Log($"{LOG_PREFIX} [Interstitial] Loaded with instance: {instanceId}");
     }
 
     // Callback invoked from JavaScript when a rewarded ad is successfully loaded
@@ -332,7 +332,7 @@ public class msstartSDK : MonoBehaviour
     {
         rewardedInstance = instanceId;
         loadingRewarded = false;
-        Debug.Log($"{LOG_PREFIX} Rewarded loaded: {instanceId}");
+        Debug.Log($"{LOG_PREFIX} [Rewarded] Loaded with instance: {instanceId}");
     }
 
     // Callback invoked from JavaScript when an interstitial ad finishes playing
