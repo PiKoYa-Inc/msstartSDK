@@ -21,7 +21,7 @@ public class TestBtn : MonoBehaviour
         {
             button.interactable = msstartSDK.Instance.RewardedReady;
             Image img = gameObject.GetComponent<Image>();
-                img.color = Color.Lerp(img.color, Color.white, Time.deltaTime * 5f);
+            img.color = Color.Lerp(img.color, Color.white, Time.deltaTime);
         }
     }
 
