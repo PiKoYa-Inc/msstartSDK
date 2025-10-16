@@ -62,6 +62,9 @@ public class msstartSDK : MonoBehaviour
 
     void Awake()
     {
+        // Set the GameObject name so JavaScript can find it in case the name is different
+        gameObject.name = "msstartSDK";
+        
         if (Instance == null)
         {
             Instance = this;
@@ -75,7 +78,6 @@ public class msstartSDK : MonoBehaviour
 
     void Start()
     {
-        DontDestroyOnLoad(gameObject);
         Initialize();
     }
 
@@ -135,6 +137,7 @@ public class msstartSDK : MonoBehaviour
     #region Ad Validation
     private bool CanShowAd(string instanceId, string adType)
     {
+        Debug.Log($"{LOG_PREFIX} Attempting to show {adType} ad with instanceId: {instanceId}");
         if (adQueued)
         {
             Debug.LogError($"{LOG_PREFIX} Ad already queued.");
