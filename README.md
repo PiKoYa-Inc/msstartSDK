@@ -44,7 +44,7 @@ YourProject/
 1. Go to **File** → **Build Settings**
 2. Switch platform to **WebGL**
 3. Click **Player Settings**
-4. Under **Publishing Settings**, ensure compression is enabled
+4. Under **Publishing Settings**, ensure compression is disabled ( If build size is too large, use [Addressables](https://docs.unity3d.com/Packages/com.unity.addressables@1.18/manual/index.html) )
 
 ---
 
